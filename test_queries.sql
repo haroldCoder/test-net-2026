@@ -16,10 +16,12 @@ PRINT '========================================================================'
 -- Obtener IDs
 DECLARE @Hab1Medellin INT = (SELECT u.Id FROM UnidadesAlojamiento u INNER JOIN Sedes s ON u.SedeId = s.Id WHERE s.Nombre = 'Medellín - Suramericana' AND u.Nombre = 'Habitación 1');
 DECLARE @Apto202Marta INT = (SELECT u.Id FROM UnidadesAlojamiento u INNER JOIN Sedes s ON u.SedeId = s.Id WHERE s.Nombre = 'Santa Marta - El Rodadero' AND u.Nombre = 'Apartamento 202');
+DECLARE @UserCarlos INT = (SELECT Id FROM Usuarios WHERE Documento = '10101010');
+DECLARE @UserAna INT = (SELECT Id FROM Usuarios WHERE Documento = '20202020');
 
-INSERT INTO Reservas (UnidadId, FechaInicio, FechaFin, CantidadPersonas, AcompanantesDia, UsaLavanderia, TotalAPagar) VALUES
-(@Hab1Medellin, '2026-06-01', '2026-06-05', 2, 0, 0, 300000),
-(@Apto202Marta, '2026-06-03', '2026-06-07', 5, 0, 1, 430000);
+INSERT INTO Reservas (UsuarioId, UnidadId, FechaInicio, FechaFin, CantidadPersonas, AcompanantesDia, UsaLavanderia, TotalAPagar) VALUES
+(@UserCarlos, @Hab1Medellin, '2026-06-01', '2026-06-05', 2, 0, 0, 300000),
+(@UserAna, @Apto202Marta, '2026-06-03', '2026-06-07', 5, 0, 1, 430000);
 
 PRINT 'Reservas insertadas con éxito.';
 GO

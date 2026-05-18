@@ -60,10 +60,21 @@ CREATE TABLE TemporadasAlta (
     FechaFin DATE NOT NULL,
     CONSTRAINT CK_Fechas CHECK (FechaFin >= FechaInicio)
 );
+-- Tabla de Usuarios (Asociados y Administradores)
+CREATE TABLE Usuarios (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    Documento VARCHAR(20) NOT NULL UNIQUE,
+    NombreCompleto VARCHAR(200) NOT NULL,
+    Correo VARCHAR(150) NOT NULL UNIQUE,
+    Telefono VARCHAR(20) NULL,
+    TipoUsuario VARCHAR(50) NOT NULL CHECK (TipoUsuario IN ('Asociado', 'Administrador')),
+    FechaRegistro DATETIME NOT NULL DEFAULT GETDATE()
+);
 
 -- Tabla de Reservas realizadas
 CREATE TABLE Reservas (
     Id INT IDENTITY(1,1) PRIMARY KEY,
+    UsuarioId INT NOT NULL FOREIGN KEY REFERENCES Usuarios(Id),
     UnidadId INT NOT NULL FOREIGN KEY REFERENCES UnidadesAlojamiento(Id),
     FechaInicio DATE NOT NULL,
     FechaFin DATE NOT NULL,
@@ -89,6 +100,12 @@ INSERT INTO Sedes (Nombre, Tipo, Ciudad) VALUES
 ('Tablones - Palmira', 'Sede Recreativa', 'Palmira'),
 ('Manguruma - Santa fe de Antioquia', 'Sede Recreativa', 'Santa fe de Antioquia'),
 ('Federman - Bogotá', 'Sede Recreativa', 'Bogotá');
+
+-- Inserción de Usuarios Semilla
+INSERT INTO Usuarios (Documento, NombreCompleto, Correo, Telefono, TipoUsuario) VALUES
+('10101010', 'Carlos Pérez (Asociado)', 'carlos.perez@asociado.com', '3101234567', 'Asociado'),
+('20202020', 'Ana Gómez (Asociado)', 'ana.gomez@asociado.com', '3117654321', 'Asociado'),
+('30303030', 'Juan Rodríguez (Admin)', 'juan.rodriguez@admin.com', '3209876543', 'Administrador');
 
 -- Obtener IDs para asociar correctamente las unidades
 DECLARE @SedeMedellin INT = (SELECT Id FROM Sedes WHERE Nombre = 'Medellín - Suramericana');
