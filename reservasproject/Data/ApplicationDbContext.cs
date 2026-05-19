@@ -12,7 +12,7 @@ namespace reservasproject.Data
         }
 
         public DbSet<Sede> Sedes { get; set; } = null!;
-
-        // Add your DbSet properties here for other entities
+        public DbSet<Usuario> Usuarios { get; set; } = null!;
+        public DbSet<Reserva> Reservas { get; set; } = null!;
     }
 }

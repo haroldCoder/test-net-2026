@@ -1,0 +1,86 @@
+@model reservasproject.Models.ViewModels.ReservaViewModel
+@{
+    ViewData["Title"] = "Confirmar Reserva";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-lg border-0 rounded-4" style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px);">
+                <div class="card-header bg-primary text-white p-4 border-0 rounded-top-4 text-center">
+                    <h2 class="mb-0 fw-bold"><i class="bi bi-check2-circle"></i> Confirmar Reserva</h2>
+                    <p class="mb-0 text-white-50">Estás a un paso de asegurar tu estadía</p>
+                </div>
+                
+                <div class="card-body p-4 p-md-5">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h5 class="text-primary fw-bold mb-3"><i class="bi bi-geo-alt"></i> Detalles del Destino</h5>
+                            <ul class="list-unstyled">
+                                <li class="mb-2"><strong>Sede:</strong> @Model.SedeNombre</li>
+                                <li class="mb-2"><strong>Alojamiento:</strong> @Model.UnidadNombre</li>
+                                <li class="mb-2"><strong>Personas:</strong> @Model.CantidadPersonas</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6 border-start border-light ps-md-4">
+                            <h5 class="text-primary fw-bold mb-3"><i class="bi bi-calendar-check"></i> Fechas de Viaje</h5>
+                            <ul class="list-unstyled">
+                                <li class="mb-2"><strong>Llegada:</strong> @Model.FechaInicio.ToString("dd MMM yyyy")</li>
+                                <li class="mb-2"><strong>Salida:</strong> @Model.FechaFin.ToString("dd MMM yyyy")</li>
+                                <li class="mb-2"><strong>Noches:</strong> @Model.CantidadNoches</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="bg-light rounded-4 p-4 mb-4">
+                        <h5 class="fw-bold text-dark mb-3"><i class="bi bi-receipt"></i> Resumen de Pago</h5>
+                        <table class="table table-borderless mb-0">
+                            <tbody>
+                                <tr>
+                                    <td class="ps-0">Hospedaje Base (@Model.CantidadNoches noches)</td>
+                                    <td class="text-end pe-0 fw-bold">$@Model.SubtotalHospedaje.ToString("N0")</td>
+                                </tr>
+                                @if (Model.TotalAcompanantesDia > 0)
+                                {
+                                    <tr>
+                                        <td class="ps-0">Acompañantes Pasadía (@Model.AcompanantesDia personas)</td>
+                                        <td class="text-end pe-0 fw-bold">$@Model.TotalAcompanantesDia.ToString("N0")</td>
+                                    </tr>
+                                }
+                                @if (Model.UsaLavanderia)
+                                {
+                                    <tr>
+                                        <td class="ps-0">Servicio de Lavandería (Cargo Único)</td>
+                                        <td class="text-end pe-0 fw-bold">$@Model.ServicioLavanderia.ToString("N0")</td>
+                                    </tr>
+                                }
+                                <tr class="border-top">
+                                    <td class="ps-0 pt-3 fs-5 fw-bold text-primary">TOTAL A PAGAR</td>
+                                    <td class="text-end pe-0 pt-3 fs-4 fw-bolder text-primary">$@Model.TotalAPagar.ToString("N0") COP</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <form asp-action="ConfirmBooking" method="post">
+                        <!-- Campos Ocultos para enviar el modelo al servidor -->
+                        <input type="hidden" asp-for="UnidadId" />
+                        <input type="hidden" asp-for="FechaInicio" />
+                        <input type="hidden" asp-for="FechaFin" />
+                        <input type="hidden" asp-for="CantidadPersonas" />
+                        <input type="hidden" asp-for="AcompanantesDia" />
+                        <input type="hidden" asp-for="UsaLavanderia" />
+                        <input type="hidden" asp-for="TotalAPagar" />
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                            <a asp-action="Index" class="btn btn-outline-secondary px-4 py-2 me-md-2 fw-bold rounded-3">Cancelar</a>
+                            <button type="submit" class="btn btn-primary px-5 py-2 fw-bold rounded-3 shadow-sm">
+                                <i class="bi bi-lock-fill"></i> Confirmar y Reservar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

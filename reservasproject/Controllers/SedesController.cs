@@ -29,9 +29,9 @@ namespace reservasproject.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAvailableSedes(DateTime fechaInicio, DateTime fechaFin, int? personas)
+        public async Task<IActionResult> GetAvailableSedes(DateTime startDate, DateTime endDate, int? guests)
         {
-            if (fechaInicio >= fechaFin)
+            if (startDate >= endDate)
             {
                 return BadRequest("La fecha de inicio debe ser anterior a la fecha de fin.");
             }
@@ -41,20 +41,20 @@ namespace reservasproject.Controllers
             var connection = _context.Database.GetDbConnection();
             using (var command = connection.CreateCommand())
             {
-                if (personas.HasValue && personas.Value > 0)
+                if (guests.HasValue && guests.Value > 0)
                 {
                     command.CommandText = "sp_BuscarDisponibilidadFechasYPersonas"; // nombre del procedimiento almacenado
                     command.CommandType = System.Data.CommandType.StoredProcedure;
-                    command.Parameters.Add(new Microsoft.Data.SqlClient.SqlParameter("@FechaInicio", fechaInicio));
-                    command.Parameters.Add(new Microsoft.Data.SqlClient.SqlParameter("@FechaFin", fechaFin));
-                    command.Parameters.Add(new Microsoft.Data.SqlClient.SqlParameter("@CantidadPersonas", personas.Value));
+                    command.Parameters.Add(new Microsoft.Data.SqlClient.SqlParameter("@FechaInicio", startDate));
+                    command.Parameters.Add(new Microsoft.Data.SqlClient.SqlParameter("@FechaFin", endDate));
+                    command.Parameters.Add(new Microsoft.Data.SqlClient.SqlParameter("@CantidadPersonas", guests.Value));
                 }
                 else
                 {
                     command.CommandText = "sp_BuscarDisponibilidadFechas"; // nombre del procedimiento almacenado
                     command.CommandType = System.Data.CommandType.StoredProcedure;
-                    command.Parameters.Add(new Microsoft.Data.SqlClient.SqlParameter("@FechaInicio", fechaInicio));
-                    command.Parameters.Add(new Microsoft.Data.SqlClient.SqlParameter("@FechaFin", fechaFin));
+                    command.Parameters.Add(new Microsoft.Data.SqlClient.SqlParameter("@FechaInicio", startDate));
+                    command.Parameters.Add(new Microsoft.Data.SqlClient.SqlParameter("@FechaFin", endDate));
                 }
 
                 if (connection.State != System.Data.ConnectionState.Open) // si la conexion no esta abierta, la abrimos
@@ -85,16 +85,16 @@ namespace reservasproject.Controllers
             }
 
             // Calcular e inyectar la tarifa base inicial para cada unidad
-            int personasDefault = personas.HasValue && personas.Value > 0 ? personas.Value : 1;
+            int defaultGuests = guests.HasValue && guests.Value > 0 ? guests.Value : 1;
             foreach (var unit in units)
             {
-                unit.TarifaTotalInicial = await GetBaselineTariff(unit.UnidadId, fechaInicio, fechaFin, personasDefault);
+                unit.TarifaTotalInicial = await GetBaselineTariff(unit.UnidadId, startDate, endDate, defaultGuests);
             }
 
             return Json(units); // retornamos el resultado en formato JSON a la vista
         }
 
-        private async Task<decimal> GetBaselineTariff(int unidadId, DateTime inicio, DateTime fin, int personas)
+        private async Task<decimal> GetBaselineTariff(int unitId, DateTime startDate, DateTime endDate, int guests)
         {
             try
             {
@@ -103,10 +103,10 @@ namespace reservasproject.Controllers
                 {
                     command.CommandText = "sp_CalcularTarifaReserva";
                     command.CommandType = System.Data.CommandType.StoredProcedure;
-                    command.Parameters.Add(new Microsoft.Data.SqlClient.SqlParameter("@UnidadId", unidadId));
-                    command.Parameters.Add(new Microsoft.Data.SqlClient.SqlParameter("@FechaInicio", inicio));
-                    command.Parameters.Add(new Microsoft.Data.SqlClient.SqlParameter("@FechaFin", fin));
-                    command.Parameters.Add(new Microsoft.Data.SqlClient.SqlParameter("@CantidadPersonas", personas));
+                    command.Parameters.Add(new Microsoft.Data.SqlClient.SqlParameter("@UnidadId", unitId));
+                    command.Parameters.Add(new Microsoft.Data.SqlClient.SqlParameter("@FechaInicio", startDate));
+                    command.Parameters.Add(new Microsoft.Data.SqlClient.SqlParameter("@FechaFin", endDate));
+                    command.Parameters.Add(new Microsoft.Data.SqlClient.SqlParameter("@CantidadPersonas", guests));
                     command.Parameters.Add(new Microsoft.Data.SqlClient.SqlParameter("@AcompanantesDia", 0));
                     command.Parameters.Add(new Microsoft.Data.SqlClient.SqlParameter("@UsaLavanderia", false));
 
@@ -126,19 +126,19 @@ namespace reservasproject.Controllers
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Error al calcular tarifa base para unidad {unidadId}: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"Error al calcular tarifa base para unidad {unitId}: {ex.Message}");
             }
             return 0;
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetCalculatedTariff(int unidadId, DateTime fechaInicio, DateTime fechaFin, int personas, int acompanantes = 0, bool lavanderia = false)
+        public async Task<IActionResult> GetCalculatedTariff(int unitId, DateTime startDate, DateTime endDate, int guests, int companions = 0, bool laundry = false)
         {
-            if (fechaInicio >= fechaFin)
+            if (startDate >= endDate)
             {
                 return BadRequest("La fecha de inicio debe ser anterior a la fecha de fin.");
             }
-            if (personas <= 0)
+            if (guests <= 0)
             {
                 return BadRequest("La cantidad de personas debe ser mayor que 0.");
             }
@@ -150,12 +150,12 @@ namespace reservasproject.Controllers
                 {
                     command.CommandText = "sp_CalcularTarifaReserva";
                     command.CommandType = System.Data.CommandType.StoredProcedure;
-                    command.Parameters.Add(new Microsoft.Data.SqlClient.SqlParameter("@UnidadId", unidadId));
-                    command.Parameters.Add(new Microsoft.Data.SqlClient.SqlParameter("@FechaInicio", fechaInicio));
-                    command.Parameters.Add(new Microsoft.Data.SqlClient.SqlParameter("@FechaFin", fechaFin));
-                    command.Parameters.Add(new Microsoft.Data.SqlClient.SqlParameter("@CantidadPersonas", personas));
-                    command.Parameters.Add(new Microsoft.Data.SqlClient.SqlParameter("@AcompanantesDia", acompanantes));
-                    command.Parameters.Add(new Microsoft.Data.SqlClient.SqlParameter("@UsaLavanderia", lavanderia));
+                    command.Parameters.Add(new Microsoft.Data.SqlClient.SqlParameter("@UnidadId", unitId));
+                    command.Parameters.Add(new Microsoft.Data.SqlClient.SqlParameter("@FechaInicio", startDate));
+                    command.Parameters.Add(new Microsoft.Data.SqlClient.SqlParameter("@FechaFin", endDate));
+                    command.Parameters.Add(new Microsoft.Data.SqlClient.SqlParameter("@CantidadPersonas", guests));
+                    command.Parameters.Add(new Microsoft.Data.SqlClient.SqlParameter("@AcompanantesDia", companions));
+                    command.Parameters.Add(new Microsoft.Data.SqlClient.SqlParameter("@UsaLavanderia", laundry));
 
                     if (connection.State != System.Data.ConnectionState.Open)
                     {
@@ -191,6 +191,115 @@ namespace reservasproject.Controllers
             }
 
             return NotFound("No se pudo calcular la tarifa.");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Book(int unitId, DateTime startDate, DateTime endDate, int guests, int companions = 0, bool laundry = false)
+        {
+            if (startDate >= endDate)
+            {
+                return RedirectToAction("Index");
+            }
+
+            try
+            {
+                var connection = _context.Database.GetDbConnection();
+                using (var command = connection.CreateCommand())
+                {
+                    command.CommandText = "sp_CalcularTarifaReserva";
+                    command.CommandType = System.Data.CommandType.StoredProcedure;
+                    command.Parameters.Add(new Microsoft.Data.SqlClient.SqlParameter("@UnidadId", unitId));
+                    command.Parameters.Add(new Microsoft.Data.SqlClient.SqlParameter("@FechaInicio", startDate));
+                    command.Parameters.Add(new Microsoft.Data.SqlClient.SqlParameter("@FechaFin", endDate));
+                    command.Parameters.Add(new Microsoft.Data.SqlClient.SqlParameter("@CantidadPersonas", guests));
+                    command.Parameters.Add(new Microsoft.Data.SqlClient.SqlParameter("@AcompanantesDia", companions));
+                    command.Parameters.Add(new Microsoft.Data.SqlClient.SqlParameter("@UsaLavanderia", laundry));
+
+                    if (connection.State != System.Data.ConnectionState.Open)
+                    {
+                        await connection.OpenAsync();
+                    }
+
+                    using (var reader = await command.ExecuteReaderAsync())
+                    {
+                        if (await reader.ReadAsync())
+                        {
+                            var model = new reservasproject.Models.ViewModels.ReservaViewModel
+                            {
+                                UnidadId = unitId,
+                                SedeNombre = reader.GetString(reader.GetOrdinal("Sede")),
+                                UnidadNombre = reader.GetString(reader.GetOrdinal("UnidadAlojamiento")),
+                                FechaInicio = startDate,
+                                FechaFin = endDate,
+                                CantidadPersonas = guests,
+                                AcompanantesDia = companions,
+                                UsaLavanderia = laundry,
+                                SubtotalHospedaje = reader.GetDecimal(reader.GetOrdinal("SubtotalHospedaje")),
+                                TotalAcompanantesDia = reader.GetDecimal(reader.GetOrdinal("TotalAcompanantesDia")),
+                                ServicioLavanderia = reader.GetDecimal(reader.GetOrdinal("ServicioLavanderia")),
+                                TotalAPagar = reader.GetDecimal(reader.GetOrdinal("TotalAPagar")),
+                                CantidadNoches = reader.GetInt32(reader.GetOrdinal("CantidadNoches"))
+                            };
+                            return View(model);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error al calcular tarifa en Reservar: {ex.Message}");
+            }
+
+            return RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ConfirmBooking(reservasproject.Models.ViewModels.ReservaViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View("Book", model);
+            }
+
+            var email = User.Identity?.Name;
+            if (string.IsNullOrEmpty(email))
+            {
+                return Unauthorized();
+            }
+
+            // Buscar usuario en tabla Usuarios o crearlo
+            var user = await _context.Usuarios.FirstOrDefaultAsync(u => u.Correo == email);
+            if (user == null)
+            {
+                user = new Usuario
+                {
+                    Documento = Guid.NewGuid().ToString().Substring(0, 8),
+                    NombreCompleto = email.Split('@')[0],
+                    Correo = email,
+                    TipoUsuario = "Asociado"
+                };
+                _context.Usuarios.Add(user);
+                await _context.SaveChangesAsync();
+            }
+
+            // Insertar la reserva
+            var reservation = new Reserva
+            {
+                UsuarioId = user.Id,
+                UnidadId = model.UnidadId,
+                FechaInicio = model.FechaInicio,
+                FechaFin = model.FechaFin,
+                CantidadPersonas = model.CantidadPersonas,
+                AcompanantesDia = model.AcompanantesDia,
+                UsaLavanderia = model.UsaLavanderia,
+                TotalAPagar = model.TotalAPagar
+            };
+
+            _context.Reservas.Add(reservation);
+            await _context.SaveChangesAsync();
+
+            return View("BookingSuccess", reservation);
         }
     }
 }
