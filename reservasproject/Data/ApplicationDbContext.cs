@@ -11,6 +11,8 @@ namespace reservasproject.Data
         {
         }
 
+        public DbSet<Sede> Sedes { get; set; } = null!;
+
         // Add your DbSet properties here for other entities
     }
 }
