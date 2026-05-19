@@ -12,5 +12,6 @@ namespace reservasproject.Models.ViewModels
         public int CapacidadMaxima { get; set; }
         public bool EsNuevo { get; set; }
         public string? DetalleCamas { get; set; }
+        public decimal TarifaTotalInicial { get; set; }
     }
 }
