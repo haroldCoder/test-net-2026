@@ -10,6 +10,7 @@ namespace reservasproject.Models.ViewModels
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
         public int Guests { get; set; }
+        public int AcompanantesDia { get; set; }
         public decimal TotalPaid { get; set; }
         public string Status { get; set; } = string.Empty; // "Próxima", "En Curso", "Finalizada"
     }
