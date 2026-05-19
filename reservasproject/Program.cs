@@ -35,6 +35,26 @@ builder.Services.AddControllersWithViews(options =>
 
 var app = builder.Build();
 
+// Inicializar la base de datos (Ejecutar schema.sql y migraciones de Identity)
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        // 1. Ejecutar el script SQL para crear la DB y la estructura base
+        reservasproject.Data.DatabaseSeeder.Initialize(services, connectionString);
+        
+        // 2. Ejecutar las migraciones de Identity (Crea las tablas de usuarios dentro de la DB generada)
+        var context = services.GetRequiredService<ApplicationDbContext>();
+        context.Database.Migrate();
+    }
+    catch (Exception ex)
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "Ocurrió un error al crear o migrar la base de datos.");
+    }
+}
+
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {

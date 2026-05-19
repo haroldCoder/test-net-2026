@@ -4,18 +4,14 @@
 -- =========================================================================
 
 -- Usar master o la base de datos por defecto del contenedor
-USE tempdb; -- tempdb es ideal para entornos de prueba, pero crearemos una BD propia si lo deseas
+USE master;
 GO
 
--- Crear Base de Datos para el sistema
-IF EXISTS (SELECT 1 FROM sys.databases WHERE name = 'SedesRecreativasDB')
+-- Crear Base de Datos para el sistema si no existe
+IF NOT EXISTS (SELECT 1 FROM sys.databases WHERE name = 'SedesRecreativasDB')
 BEGIN
-    ALTER DATABASE SedesRecreativasDB SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
-    DROP DATABASE SedesRecreativasDB;
+    CREATE DATABASE SedesRecreativasDB;
 END
-GO
-
-CREATE DATABASE SedesRecreativasDB;
 GO
 
 USE SedesRecreativasDB;
