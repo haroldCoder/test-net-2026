@@ -27,18 +27,52 @@
 
     <!-- Search and Filters Section -->
     <div class="search-filter-wrapper">
-        <div class="row g-3 align-items-center">
-            <div class="col-md-5">
+        <form id="availabilityForm" onsubmit="searchAvailability(event)" class="row g-3 align-items-end mb-4">
+            <div class="col-lg-3 col-md-6">
+                <label class="form-label text-muted fw-bold small"><i class="bi bi-search"></i> Buscar Sitio/Ciudad</label>
                 <div class="search-input-group">
                     <i class="bi bi-search"></i>
-                    <input type="text" id="searchInput" class="form-control search-input form-control-lg" placeholder="Buscar por nombre o ciudad..." />
+                    <input type="text" id="searchInput" class="form-control search-input" placeholder="Nombre o ciudad..." />
                 </div>
             </div>
-            <div class="col-md-7 text-md-end">
-                <div class="d-flex gap-2 justify-content-md-end flex-wrap">
+            <div class="col-lg-3 col-md-6">
+                <label class="form-label text-muted fw-bold small"><i class="bi bi-calendar-event"></i> Check-In (Entrada)</label>
+                <input type="date" id="checkInDate" class="form-control form-control-lg date-input" required />
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <label class="form-label text-muted fw-bold small"><i class="bi bi-calendar-check"></i> Check-Out (Salida)</label>
+                <input type="date" id="checkOutDate" class="form-control form-control-lg date-input" required />
+            </div>
+            <div class="col-lg-2 col-md-4">
+                <label class="form-label text-muted fw-bold small"><i class="bi bi-people"></i> Personas</label>
+                <select id="guestCount" class="form-select form-select-lg guests-select">
+                    <option value="">Cualquiera</option>
+                    <option value="1">1 Persona</option>
+                    <option value="2">2 Personas</option>
+                    <option value="3">3 Personas</option>
+                    <option value="4">4 Personas</option>
+                    <option value="5">5 Personas</option>
+                    <option value="6">6+ Personas</option>
+                </select>
+            </div>
+            <div class="col-lg-1 col-md-2 text-end">
+                <button type="submit" class="btn btn-primary btn-lg w-100 search-btn-grad">
+                    <i class="bi bi-search"></i>
+                </button>
+            </div>
+        </form>
+        
+        <div class="row pt-3 border-top border-light-subtle">
+            <div class="col-md-12 text-md-start">
+                <div class="d-flex gap-2 align-items-center flex-wrap">
+                    <span class="text-muted fw-bold small me-2"><i class="bi bi-funnel"></i> Filtrar Categoría:</span>
                     <button class="filter-btn active" onclick="filterPlaces('todos', this)">Todos</button>
                     <button class="filter-btn" onclick="filterPlaces('Apartamento', this)">Apartamentos</button>
                     <button class="filter-btn" onclick="filterPlaces('Sede Recreativa', this)">Sedes Recreativas</button>
+                    
+                    <button id="clearDatesBtn" class="btn btn-outline-danger btn-sm rounded-pill ms-auto d-none" onclick="clearAvailabilitySearch()">
+                        <i class="bi bi-x-circle"></i> Limpiar Fechas
+                    </button>
                 </div>
             </div>
         </div>
@@ -52,6 +86,21 @@
                 <span class="visually-hidden">Cargando lugares...</span>
             </div>
             <p class="mt-3 text-muted">Cargando destinos...</p>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Detalles y Disponibilidad de Unidades -->
+<div class="modal fade" id="sedeDetailsModal" tabindex="-1" aria-labelledby="sedeDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content glass-modal">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-extrabold" id="sedeDetailsModalLabel" style="font-weight: 800; font-size: 1.6rem;"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body pt-3" id="sedeDetailsModalBody">
+                <!-- Se cargará dinámicamente -->
+            </div>
         </div>
     </div>
 </div>
