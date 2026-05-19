@@ -1,0 +1,87 @@
+@model IEnumerable<reservasproject.Models.ViewModels.MyBookingViewModel>
+@{
+    ViewData["Title"] = "Mis Reservas";
+}
+
+<div class="container py-5">
+    <div class="row mb-4 align-items-center">
+        <div class="col-md-8">
+            <h1 class="fw-bold display-6 mb-1">Mis Reservas</h1>
+            <p class="text-muted">Aquí puedes ver el historial completo de tus estadías pasadas y futuras.</p>
+        </div>
+        <div class="col-md-4 text-md-end">
+            <a asp-controller="Sedes" asp-action="Index" class="btn btn-primary rounded-pill px-4 shadow-sm">
+                <i class="bi bi-plus-circle"></i> Nueva Reserva
+            </a>
+        </div>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="card border-0 shadow-sm rounded-4 text-center py-5 mt-4" style="background: rgba(255,255,255,0.8); backdrop-filter: blur(10px);">
+            <div class="card-body py-5">
+                <i class="bi bi-calendar-x text-muted" style="font-size: 4rem;"></i>
+                <h3 class="mt-4 fw-bold">Aún no tienes reservas</h3>
+                <p class="text-muted mb-4 px-3">Parece que todavía no has programado ningún viaje con nosotros. ¡Explora nuestros destinos y anímate a reservar tu primer descanso!</p>
+                <a asp-controller="Sedes" asp-action="Index" class="btn btn-outline-primary rounded-pill px-4">Explorar Destinos</a>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="row row-cols-1 row-cols-lg-2 g-4">
+            @foreach (var booking in Model)
+            {
+                string statusColor = booking.Status switch
+                {
+                    "Próxima" => "bg-success text-white",
+                    "En Curso" => "bg-primary text-white",
+                    _ => "bg-secondary text-white"
+                };
+
+                string cardOpacity = booking.Status == "Finalizada" ? "opacity-75" : "opacity-100";
+
+                <div class="col">
+                    <div class="card border-0 shadow-sm rounded-4 h-100 @cardOpacity" style="transition: transform 0.2s;">
+                        <div class="card-header border-0 pb-0 bg-transparent mt-2 d-flex justify-content-between align-items-center">
+                            <span class="badge rounded-pill @statusColor px-3 py-2 fw-normal" style="font-size: 0.85rem;">
+                                @if(booking.Status == "Próxima") { <i class="bi bi-calendar-event me-1"></i> }
+                                else if(booking.Status == "En Curso") { <i class="bi bi-play-circle me-1"></i> }
+                                else { <i class="bi bi-check-circle me-1"></i> }
+                                @booking.Status
+                            </span>
+                            <span class="text-muted small fw-bold">ID: #@booking.BookingId.ToString("D5")</span>
+                        </div>
+                        <div class="card-body">
+                            <h4 class="card-title fw-bold text-dark mb-1">@booking.UnitName</h4>
+                            <p class="text-muted mb-3"><i class="bi bi-geo-alt"></i> @booking.SedeName</p>
+                            
+                            <div class="bg-light rounded-3 p-3 mb-3 border">
+                                <div class="row text-center">
+                                    <div class="col-6 border-end">
+                                        <small class="text-muted d-block mb-1">Entrada</small>
+                                        <span class="fw-bold text-dark">@booking.StartDate.ToString("dd MMM yyyy")</span>
+                                    </div>
+                                    <div class="col-6">
+                                        <small class="text-muted d-block mb-1">Salida</small>
+                                        <span class="fw-bold text-dark">@booking.EndDate.ToString("dd MMM yyyy")</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="d-flex justify-content-between align-items-end mt-4">
+                                <div>
+                                    <span class="text-muted small"><i class="bi bi-people"></i> @booking.Guests personas</span>
+                                </div>
+                                <div class="text-end">
+                                    <small class="text-muted d-block" style="font-size: 0.75rem;">Total Pagado</small>
+                                    <span class="fw-bolder fs-5 text-primary">$@booking.TotalPaid.ToString("N0")</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

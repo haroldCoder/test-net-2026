@@ -59,5 +59,5 @@ function bookUnit(unidadId, unidadNombre, SedeNombre) {
     const lavanderia = lavanderiaCheck ? lavanderiaCheck.checked : false;
 
     // Redirigir a la vista de reserva con los parámetros
-    window.location.href = `/Sedes/Book?unitId=${unidadId}&startDate=${checkIn}&endDate=${checkOut}&guests=${guests}&companions=${acompanantes}&laundry=${lavanderia}`;
+    window.location.href = `/Bookings/Book?unitId=${unidadId}&startDate=${checkIn}&endDate=${checkOut}&guests=${guests}&companions=${acompanantes}&laundry=${lavanderia}`;
 }
