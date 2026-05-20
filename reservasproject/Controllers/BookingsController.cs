@@ -156,6 +156,7 @@ namespace reservasproject.Controllers
                         r.FechaFin,
                         r.CantidadPersonas,
                         r.AcompanantesDia,
+                        r.UsaLavanderia,
                         r.TotalAPagar
                     FROM Reservas r
                     INNER JOIN UnidadesAlojamiento u ON r.UnidadId = u.Id
@@ -196,6 +197,7 @@ namespace reservasproject.Controllers
                             EndDate = fechaFin,
                             Guests = reader.GetInt32(reader.GetOrdinal("CantidadPersonas")),
                             AcompanantesDia = reader.GetInt32(reader.GetOrdinal("AcompanantesDia")),
+                            UsaLavanderia = reader.GetBoolean(reader.GetOrdinal("UsaLavanderia")),
                             TotalPaid = reader.GetDecimal(reader.GetOrdinal("TotalAPagar")),
                             Status = status
                         });

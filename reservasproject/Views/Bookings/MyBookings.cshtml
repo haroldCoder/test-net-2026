@@ -69,7 +69,26 @@
                                 </div>
                             </div>
                             
-                            <div class="d-flex justify-content-between align-items-end mt-4">
+                            @* Servicios contratados *@
+                            @if (booking.UsaLavanderia || booking.AcompanantesDia > 0)
+                            {
+                                <div class="d-flex flex-wrap gap-2 mb-3">
+                                    @if (booking.UsaLavanderia)
+                                    {
+                                        <span class="badge rounded-pill bg-info text-dark px-3 py-2 fw-normal" style="font-size: 0.8rem;">
+                                            <i class="bi bi-droplet-fill me-1"></i> Lavandería incluida
+                                        </span>
+                                    }
+                                    @if (booking.AcompanantesDia > 0)
+                                    {
+                                        <span class="badge rounded-pill bg-warning text-dark px-3 py-2 fw-normal" style="font-size: 0.8rem;">
+                                            <i class="bi bi-people-fill me-1"></i> @booking.AcompanantesDia acompañante@(booking.AcompanantesDia != 1 ? "s" : "") (pasadía)
+                                        </span>
+                                    }
+                                </div>
+                            }
+
+                            <div class="d-flex justify-content-between align-items-end mt-2">
                                 <div>
                                     @{
                                         var totalPeople = booking.Guests + booking.AcompanantesDia;
