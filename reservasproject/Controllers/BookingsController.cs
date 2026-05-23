@@ -126,7 +126,13 @@ namespace reservasproject.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> MyBookings()
+        public IActionResult MyBookings()
+        {
+            return View();
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetMyBookingsData()
         {
             var email = User.Identity?.Name;
             if (string.IsNullOrEmpty(email))
@@ -137,8 +143,7 @@ namespace reservasproject.Controllers
             var user = await _context.Usuarios.FirstOrDefaultAsync(u => u.Correo == email);
             if (user == null)
             {
-                // Si no existe el usuario en la tabla Usuarios, no tiene reservas
-                return View(new List<reservasproject.Models.ViewModels.MyBookingViewModel>());
+                return Json(new List<reservasproject.Models.ViewModels.MyBookingViewModel>());
             }
 
             var bookings = new List<reservasproject.Models.ViewModels.MyBookingViewModel>();
@@ -146,7 +151,6 @@ namespace reservasproject.Controllers
             var connection = _context.Database.GetDbConnection();
             using (var command = connection.CreateCommand())
             {
-                // Unimos Reservas con UnidadesAlojamiento y Sedes para obtener nombres
                 command.CommandText = @"
                     SELECT 
                         r.Id AS ReservaId,
@@ -205,7 +209,7 @@ namespace reservasproject.Controllers
                 }
             }
 
-            return View(bookings);
+            return Json(bookings);
         }
     }
 }
